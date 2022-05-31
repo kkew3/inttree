@@ -54,7 +54,7 @@ class IntTree {
         return !t1.eq(t2);
     }
 public:
-    IntTree(): root(nullptr), NIL(nullptr) {
+    IntTree(): NIL(nullptr), root(nullptr) {
         NIL = make_nil();
         root = NIL;
     }
