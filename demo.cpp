@@ -18,7 +18,7 @@ int main() {
     // traverse in in-order and print
     std::cout << "Traverse:\n";
     if (!tree.empty()) {
-        inttree::rbnode *x = tree.minimum();
+        inttree::RBNode *x = tree.minimum();
         do {
             std::cout << "[" << x->intvl.first << ", " << x->intvl.second << "]\n";
         } while ((x = tree.successor(x)));
@@ -27,11 +27,11 @@ int main() {
     // find overlapping intervals
     inttree::ClosedInterval i = inttree::make_interval(18, 26);
     // find any one of the overlapping interval
-    inttree::rbnode *found = tree.intsearch(i);
+    inttree::RBNode *found = tree.intsearch(i);
     std::cout << "found one:\n";
     std::cout << "[" << found->intvl.first << ", " << found->intvl.second << "]\n";
     // find all overlapping interval
-    std::vector<inttree::rbnode *> all_found = tree.intsearch_all(i);
+    std::vector<inttree::RBNode *> all_found = tree.intsearch_all(i);
     std::cout << "found all:\n";
     for (auto it = all_found.begin(); it != all_found.end(); ++it) {
         std::cout << "[" << (*it)->intvl.first << ", "

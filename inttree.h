@@ -25,22 +25,22 @@ inline bool closed_interval_overlap(const ClosedInterval &i1,
 }
 
 
-enum class rbcolor { black, red };
+enum class RBColor { black, red };
 
-struct rbnode {
+struct RBNode {
     ClosedInterval intvl;
     int max;
-    rbnode *left;
-    rbnode *right;
-    rbnode *par;
-    rbcolor color;
+    RBNode *left;
+    RBNode *right;
+    RBNode *par;
+    RBColor color;
 
-    rbnode(ClosedInterval intvl, rbcolor color):
+    RBNode(ClosedInterval intvl, RBColor color):
             intvl(intvl), max(intvl.second), left(nullptr), right(nullptr),
             par(nullptr), color(color)
     {}
 
-    rbnode(const rbnode &) = default;
+    RBNode(const RBNode &) = default;
 
     inline int key() const { return intvl.first; }
 };
@@ -61,46 +61,46 @@ public:
     IntTree(const IntTree &);
     IntTree(IntTree &&);
     ~IntTree();
-    static inline rbnode *make_nil() {
-        return new rbnode(make_interval(1, 0), rbcolor::black);
+    static inline RBNode *make_nil() {
+        return new RBNode(make_interval(1, 0), RBColor::black);
     }
     // Being static and not relying on the identity of NIL is important for
     // the implementation of operator= method
-    static inline bool is_nil(rbnode *z) {
+    static inline bool is_nil(RBNode *z) {
         return z->intvl.first > z->intvl.second;
     }
     IntTree &operator=(const IntTree &);
-    rbnode *clone() const;
+    RBNode *clone() const;
     inline bool empty() const { return is_nil(root); }
     void clear();
     bool eq(const IntTree &) const;
 
-    rbnode *make_node(ClosedInterval) const;
-    rbnode *contains(const ClosedInterval &) const;
-    inline rbnode *minimum() const {
+    RBNode *make_node(ClosedInterval) const;
+    RBNode *contains(const ClosedInterval &) const;
+    inline RBNode *minimum() const {
         return empty() ? nullptr : minimum(root);
     }
     /// if arg is NIL the behavior is undefined
-    rbnode *minimum(rbnode *) const;
+    RBNode *minimum(RBNode *) const;
     /// if arg is NIL the behavior is undefined
-    rbnode *successor(rbnode *) const;
+    RBNode *successor(RBNode *) const;
     /// if arg is NIL the behavior is undefined
-    void insert(rbnode *);
+    void insert(RBNode *);
     /// if arg is NIL the behavior is undefined
-    void erase(rbnode *);
-    rbnode *intsearch(const ClosedInterval &) const;
-    std::vector<rbnode *> intsearch_all(const ClosedInterval &) const;
+    void erase(RBNode *);
+    RBNode *intsearch(const ClosedInterval &) const;
+    std::vector<RBNode *> intsearch_all(const ClosedInterval &) const;
 private:
-    void left_rotate(rbnode *);
-    void right_rotate(rbnode *);
-    void transplant(rbnode *, rbnode *);
-    void update_max(rbnode *);
+    void left_rotate(RBNode *);
+    void right_rotate(RBNode *);
+    void transplant(RBNode *, RBNode *);
+    void update_max(RBNode *);
 
     /// an internal representation; should be exposed to outside as nullptr
-    rbnode *NIL;
+    RBNode *NIL;
 public:
     /// should be private, but left public for convenience of testing
-    rbnode *root;
+    RBNode *root;
 };
 
 }
