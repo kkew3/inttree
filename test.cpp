@@ -8,162 +8,161 @@
 #include "inttree.h"
 #include <catch2/catch_test_macros.hpp>
 #include <set>
-#include <utility>
 #include <vector>
 
 using namespace inttree;
 
 TEST_CASE("IntTree trivial insert")
 {
-	IntTree t;
-	RBNode* node;
-	ClosedInterval i;
-	REQUIRE(IntTree::is_nil(t.root));
+	IntTree<int, int> t;
+	RBNode<int, int>* node;
+	ClosedInterval<int> i;
+	REQUIRE(t.is_nil(t.root));
 	REQUIRE(t.root->color == RBColor::black);
 
-	i = make_interval(9, 16);
+	i = ClosedInterval<int>(9, 16);
 	t.insert(t.make_node(i));
 	REQUIRE_FALSE(t.root == nullptr);
-	REQUIRE_FALSE(IntTree::is_nil(t.root));
+	REQUIRE_FALSE(t.is_nil(t.root));
 	REQUIRE(t.root->intvl == i);
-	REQUIRE(IntTree::is_nil(t.root->left));
-	REQUIRE(IntTree::is_nil(t.root->right));
-	REQUIRE(IntTree::is_nil(t.root->par));
+	REQUIRE(t.is_nil(t.root->left));
+	REQUIRE(t.is_nil(t.root->right));
+	REQUIRE(t.is_nil(t.root->par));
 	REQUIRE(t.root->color == RBColor::black);
 	REQUIRE(t.root->max == 16);
 }
 
 TEST_CASE("IntTree test")
 {
-	std::vector<ClosedInterval> intvls {
-		make_interval(17, 19),
-		make_interval(15, 23),
-		make_interval(25, 30),
-		make_interval(8, 9),
-		make_interval(0, 3),
-		make_interval(19, 20),
-		make_interval(26, 26),
-		make_interval(6, 10),
-		make_interval(16, 21),
-		make_interval(5, 8)
+	std::vector<ClosedInterval<int>> intvls {
+		ClosedInterval<int>(17, 19),
+		ClosedInterval<int>(15, 23),
+		ClosedInterval<int>(25, 30),
+		ClosedInterval<int>(8, 9),
+		ClosedInterval<int>(0, 3),
+		ClosedInterval<int>(19, 20),
+		ClosedInterval<int>(26, 26),
+		ClosedInterval<int>(6, 10),
+		ClosedInterval<int>(16, 21),
+		ClosedInterval<int>(5, 8)
 	};
 
-	IntTree t;
-	RBNode* node;
-	ClosedInterval i;
-	REQUIRE(IntTree::is_nil(t.root));
+	IntTree<int, int> t;
+	RBNode<int, int>* node;
+	ClosedInterval<int> i;
+	REQUIRE(t.is_nil(t.root));
 	REQUIRE(t.root->color == RBColor::black);
 
-	for (auto i = intvls.begin(); i != intvls.end(); ++i) {
-		t.insert(t.make_node(*i));
+	for (auto itr = intvls.begin(); itr != intvls.end(); ++itr) {
+		t.insert(t.make_node(*itr));
 	}
 
-	std::set<ClosedInterval> iset, refiset;
+	std::set<ClosedInterval<int>> iset, refiset;
 
 	// for the right answer see
 	// https://www.cs.usfca.edu/~galles/visualization/RedBlack.html
 	SECTION("insert")
 	{
 		node = t.root;
-		i = make_interval(17, 19);
+		i = ClosedInterval<int>(17, 19);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 30);
-		REQUIRE(IntTree::is_nil(node->par));
+		REQUIRE(t.is_nil(node->par));
 		REQUIRE(node->color == RBColor::black);
 
 		node = t.root->left;
-		i = make_interval(8, 9);
+		i = ClosedInterval<int>(8, 9);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 23);
 		REQUIRE(node->color == RBColor::red);
 
 		node = t.root->right;
-		i = make_interval(25, 30);
+		i = ClosedInterval<int>(25, 30);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 30);
 		REQUIRE(node->color == RBColor::black);
 
 		node = t.root->left->left;
-		i = make_interval(5, 8);
+		i = ClosedInterval<int>(5, 8);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 10);
 		REQUIRE(node->color == RBColor::black);
 
 		node = t.root->left->right;
-		i = make_interval(15, 23);
+		i = ClosedInterval<int>(15, 23);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 23);
 		REQUIRE(node->color == RBColor::black);
-		REQUIRE(IntTree::is_nil(node->left));
+		REQUIRE(t.is_nil(node->left));
 
 		node = t.root->right->left;
-		i = make_interval(19, 20);
+		i = ClosedInterval<int>(19, 20);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 20);
 		REQUIRE(node->color == RBColor::red);
-		REQUIRE(IntTree::is_nil(node->left));
-		REQUIRE(IntTree::is_nil(node->right));
+		REQUIRE(t.is_nil(node->left));
+		REQUIRE(t.is_nil(node->right));
 
 		node = t.root->right->right;
-		i = make_interval(26, 26);
+		i = ClosedInterval<int>(26, 26);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 26);
 		REQUIRE(node->color == RBColor::red);
-		REQUIRE(IntTree::is_nil(node->left));
-		REQUIRE(IntTree::is_nil(node->right));
+		REQUIRE(t.is_nil(node->left));
+		REQUIRE(t.is_nil(node->right));
 
 		node = t.root->left->left->left;
-		i = make_interval(0, 3);
+		i = ClosedInterval<int>(0, 3);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 3);
 		REQUIRE(node->color == RBColor::red);
-		REQUIRE(IntTree::is_nil(node->left));
-		REQUIRE(IntTree::is_nil(node->right));
+		REQUIRE(t.is_nil(node->left));
+		REQUIRE(t.is_nil(node->right));
 
 		node = t.root->left->left->right;
-		i = make_interval(6, 10);
+		i = ClosedInterval<int>(6, 10);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 10);
 		REQUIRE(node->color == RBColor::red);
-		REQUIRE(IntTree::is_nil(node->left));
-		REQUIRE(IntTree::is_nil(node->right));
+		REQUIRE(t.is_nil(node->left));
+		REQUIRE(t.is_nil(node->right));
 
 		node = t.root->left->right->right;
-		i = make_interval(16, 21);
+		i = ClosedInterval<int>(16, 21);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 21);
 		REQUIRE(node->color == RBColor::red);
-		REQUIRE(IntTree::is_nil(node->left));
-		REQUIRE(IntTree::is_nil(node->right));
+		REQUIRE(t.is_nil(node->left));
+		REQUIRE(t.is_nil(node->right));
 	}
 
 	SECTION("intsearch(16, 21)")
 	{
-		i = make_interval(16, 21);
-		refiset.insert(make_interval(19, 20));
-		refiset.insert(make_interval(17, 19));
-		refiset.insert(make_interval(16, 21));
-		refiset.insert(make_interval(15, 23));
+		i = ClosedInterval<int>(16, 21);
+		refiset.insert(ClosedInterval<int>(19, 20));
+		refiset.insert(ClosedInterval<int>(17, 19));
+		refiset.insert(ClosedInterval<int>(16, 21));
+		refiset.insert(ClosedInterval<int>(15, 23));
 
 		SECTION("intsearch(16, 21) one-by-one")
 		{
@@ -176,7 +175,7 @@ TEST_CASE("IntTree test")
 
 		SECTION("intsearch(16, 21) all")
 		{
-			std::vector<RBNode *> iset_vec = t.intsearch_all(i);
+			auto iset_vec = t.intsearch_all(i);
 			for (auto itr = iset_vec.begin(); itr != iset_vec.end(); ++itr) {
 				iset.insert((*itr)->intvl);
 			}
@@ -186,7 +185,7 @@ TEST_CASE("IntTree test")
 
 	SECTION("intsearch(11, 13)")
 	{
-		i = make_interval(11, 13);
+		i = ClosedInterval<int>(11, 13);
 		
 		SECTION("intsearch(11, 13) one-by-one")
 		{
@@ -199,7 +198,7 @@ TEST_CASE("IntTree test")
 
 		SECTION("intsearch(11, 13) all")
 		{
-			std::vector<RBNode *> iset_vec = t.intsearch_all(i);
+			auto iset_vec = t.intsearch_all(i);
 			for (auto itr = iset_vec.begin(); itr != iset_vec.end(); ++itr) {
 				iset.insert((*itr)->intvl);
 			}
@@ -209,8 +208,8 @@ TEST_CASE("IntTree test")
 
 	SECTION("intsearch(3, 4)")
 	{
-		i = make_interval(3, 4);
-		refiset.insert(make_interval(0, 3));
+		i = ClosedInterval<int>(3, 4);
+		refiset.insert(ClosedInterval<int>(0, 3));
 
 		SECTION("intsearch(3, 4) one-by-one")
 		{
@@ -223,7 +222,7 @@ TEST_CASE("IntTree test")
 
 		SECTION("intsearch(3, 4) all")
 		{
-			std::vector<RBNode *> iset_vec = t.intsearch_all(i);
+			auto iset_vec = t.intsearch_all(i);
 			for (auto itr = iset_vec.begin(); itr != iset_vec.end(); ++itr) {
 				iset.insert((*itr)->intvl);
 			}
@@ -233,10 +232,10 @@ TEST_CASE("IntTree test")
 
 	SECTION("intsearch(23, 26)")
 	{
-		i = make_interval(23, 26);
-		refiset.insert(make_interval(15, 23));
-		refiset.insert(make_interval(25, 30));
-		refiset.insert(make_interval(26, 26));
+		i = ClosedInterval<int>(23, 26);
+		refiset.insert(ClosedInterval<int>(15, 23));
+		refiset.insert(ClosedInterval<int>(25, 30));
+		refiset.insert(ClosedInterval<int>(26, 26));
 
 		SECTION("intsearch(23, 26) one-by-one")
 		{
@@ -249,7 +248,7 @@ TEST_CASE("IntTree test")
 
 		SECTION("intsearch(23, 26) all")
 		{
-			std::vector<RBNode *> iset_vec = t.intsearch_all(i);
+			auto iset_vec = t.intsearch_all(i);
 			for (auto itr = iset_vec.begin(); itr != iset_vec.end(); ++itr) {
 				iset.insert((*itr)->intvl);
 			}
@@ -259,20 +258,20 @@ TEST_CASE("IntTree test")
 
 	SECTION("intsearch(9, 16) & intsearch(23, 25)")
 	{
-		i = make_interval(9, 16);
-		refiset.insert(make_interval(8, 9));
-		refiset.insert(make_interval(6, 10));
-		refiset.insert(make_interval(15, 23));
-		refiset.insert(make_interval(16, 21));
+		i = ClosedInterval<int>(9, 16);
+		refiset.insert(ClosedInterval<int>(8, 9));
+		refiset.insert(ClosedInterval<int>(6, 10));
+		refiset.insert(ClosedInterval<int>(15, 23));
+		refiset.insert(ClosedInterval<int>(16, 21));
 		while ((node = t.intsearch(i))) {
 			iset.insert(node->intvl);
 			t.erase(node);
 		}
 		REQUIRE(iset == refiset);
 
-		i = make_interval(23, 25);
+		i = ClosedInterval<int>(23, 25);
 		refiset.clear();
-		refiset.insert(make_interval(25, 30));
+		refiset.insert(ClosedInterval<int>(25, 30));
 		iset.clear();
 		while ((node = t.intsearch(i))) {
 			iset.insert(node->intvl);
@@ -297,310 +296,310 @@ TEST_CASE("IntTree test")
 
 	SECTION("copy constructor")
 	{
-		IntTree t2(t);
+		IntTree<int, int> t2(t);
 		t.clear();
 		REQUIRE_FALSE(t2.empty());
 
 		node = t2.root;
-		i = make_interval(17, 19);
+		i = ClosedInterval<int>(17, 19);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 30);
-		REQUIRE(IntTree::is_nil(node->par));
+		REQUIRE(t2.is_nil(node->par));
 		REQUIRE(node->color == RBColor::black);
 
 		node = t2.root->left;
-		i = make_interval(8, 9);
+		i = ClosedInterval<int>(8, 9);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 23);
 		REQUIRE(node->color == RBColor::red);
 
 		node = t2.root->right;
-		i = make_interval(25, 30);
+		i = ClosedInterval<int>(25, 30);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 30);
 		REQUIRE(node->color == RBColor::black);
 
 		node = t2.root->left->left;
-		i = make_interval(5, 8);
+		i = ClosedInterval<int>(5, 8);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 10);
 		REQUIRE(node->color == RBColor::black);
 
 		node = t2.root->left->right;
-		i = make_interval(15, 23);
+		i = ClosedInterval<int>(15, 23);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 23);
 		REQUIRE(node->color == RBColor::black);
-		REQUIRE(IntTree::is_nil(node->left));
+		REQUIRE(t2.is_nil(node->left));
 
 		node = t2.root->right->left;
-		i = make_interval(19, 20);
+		i = ClosedInterval<int>(19, 20);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 20);
 		REQUIRE(node->color == RBColor::red);
-		REQUIRE(IntTree::is_nil(node->left));
-		REQUIRE(IntTree::is_nil(node->right));
+		REQUIRE(t2.is_nil(node->left));
+		REQUIRE(t2.is_nil(node->right));
 
 		node = t2.root->right->right;
-		i = make_interval(26, 26);
+		i = ClosedInterval<int>(26, 26);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 26);
 		REQUIRE(node->color == RBColor::red);
-		REQUIRE(IntTree::is_nil(node->left));
-		REQUIRE(IntTree::is_nil(node->right));
+		REQUIRE(t2.is_nil(node->left));
+		REQUIRE(t2.is_nil(node->right));
 
 		node = t2.root->left->left->left;
-		i = make_interval(0, 3);
+		i = ClosedInterval<int>(0, 3);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 3);
 		REQUIRE(node->color == RBColor::red);
-		REQUIRE(IntTree::is_nil(node->left));
-		REQUIRE(IntTree::is_nil(node->right));
+		REQUIRE(t2.is_nil(node->left));
+		REQUIRE(t2.is_nil(node->right));
 
 		node = t2.root->left->left->right;
-		i = make_interval(6, 10);
+		i = ClosedInterval<int>(6, 10);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 10);
 		REQUIRE(node->color == RBColor::red);
-		REQUIRE(IntTree::is_nil(node->left));
-		REQUIRE(IntTree::is_nil(node->right));
+		REQUIRE(t2.is_nil(node->left));
+		REQUIRE(t2.is_nil(node->right));
 
 		node = t2.root->left->right->right;
-		i = make_interval(16, 21);
+		i = ClosedInterval<int>(16, 21);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 21);
 		REQUIRE(node->color == RBColor::red);
-		REQUIRE(IntTree::is_nil(node->left));
-		REQUIRE(IntTree::is_nil(node->right));
+		REQUIRE(t2.is_nil(node->left));
+		REQUIRE(t2.is_nil(node->right));
 	}
 	
 	SECTION("operator=")
 	{
-		IntTree t2 = t;
+		IntTree<int, int> t2 = t;
 		t.clear();
 		REQUIRE_FALSE(t2.empty());
 
 		node = t2.root;
-		i = make_interval(17, 19);
+		i = ClosedInterval<int>(17, 19);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 30);
-		REQUIRE(IntTree::is_nil(node->par));
+		REQUIRE(t2.is_nil(node->par));
 		REQUIRE(node->color == RBColor::black);
 
 		node = t2.root->left;
-		i = make_interval(8, 9);
+		i = ClosedInterval<int>(8, 9);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 23);
 		REQUIRE(node->color == RBColor::red);
 
 		node = t2.root->right;
-		i = make_interval(25, 30);
+		i = ClosedInterval<int>(25, 30);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 30);
 		REQUIRE(node->color == RBColor::black);
 
 		node = t2.root->left->left;
-		i = make_interval(5, 8);
+		i = ClosedInterval<int>(5, 8);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 10);
 		REQUIRE(node->color == RBColor::black);
 
 		node = t2.root->left->right;
-		i = make_interval(15, 23);
+		i = ClosedInterval<int>(15, 23);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 23);
 		REQUIRE(node->color == RBColor::black);
-		REQUIRE(IntTree::is_nil(node->left));
+		REQUIRE(t2.is_nil(node->left));
 
 		node = t2.root->right->left;
-		i = make_interval(19, 20);
+		i = ClosedInterval<int>(19, 20);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 20);
 		REQUIRE(node->color == RBColor::red);
-		REQUIRE(IntTree::is_nil(node->left));
-		REQUIRE(IntTree::is_nil(node->right));
+		REQUIRE(t2.is_nil(node->left));
+		REQUIRE(t2.is_nil(node->right));
 
 		node = t2.root->right->right;
-		i = make_interval(26, 26);
+		i = ClosedInterval<int>(26, 26);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 26);
 		REQUIRE(node->color == RBColor::red);
-		REQUIRE(IntTree::is_nil(node->left));
-		REQUIRE(IntTree::is_nil(node->right));
+		REQUIRE(t2.is_nil(node->left));
+		REQUIRE(t2.is_nil(node->right));
 
 		node = t2.root->left->left->left;
-		i = make_interval(0, 3);
+		i = ClosedInterval<int>(0, 3);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 3);
 		REQUIRE(node->color == RBColor::red);
-		REQUIRE(IntTree::is_nil(node->left));
-		REQUIRE(IntTree::is_nil(node->right));
+		REQUIRE(t2.is_nil(node->left));
+		REQUIRE(t2.is_nil(node->right));
 
 		node = t2.root->left->left->right;
-		i = make_interval(6, 10);
+		i = ClosedInterval<int>(6, 10);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 10);
 		REQUIRE(node->color == RBColor::red);
-		REQUIRE(IntTree::is_nil(node->left));
-		REQUIRE(IntTree::is_nil(node->right));
+		REQUIRE(t2.is_nil(node->left));
+		REQUIRE(t2.is_nil(node->right));
 
 		node = t2.root->left->right->right;
-		i = make_interval(16, 21);
+		i = ClosedInterval<int>(16, 21);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 21);
 		REQUIRE(node->color == RBColor::red);
-		REQUIRE(IntTree::is_nil(node->left));
-		REQUIRE(IntTree::is_nil(node->right));
+		REQUIRE(t2.is_nil(node->left));
+		REQUIRE(t2.is_nil(node->right));
 	}
 
 	SECTION("move constructor")
 	{
-		IntTree t2(std::move(t));
+		IntTree<int, int> t2(std::move(t));
 		REQUIRE(t.empty());
 		REQUIRE_FALSE(t2.empty());
 
 		node = t2.root;
-		i = make_interval(17, 19);
+		i = ClosedInterval<int>(17, 19);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 30);
-		REQUIRE(IntTree::is_nil(node->par));
+		REQUIRE(t2.is_nil(node->par));
 		REQUIRE(node->color == RBColor::black);
 
 		node = t2.root->left;
-		i = make_interval(8, 9);
+		i = ClosedInterval<int>(8, 9);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 23);
 		REQUIRE(node->color == RBColor::red);
 
 		node = t2.root->right;
-		i = make_interval(25, 30);
+		i = ClosedInterval<int>(25, 30);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 30);
 		REQUIRE(node->color == RBColor::black);
 
 		node = t2.root->left->left;
-		i = make_interval(5, 8);
+		i = ClosedInterval<int>(5, 8);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 10);
 		REQUIRE(node->color == RBColor::black);
 
 		node = t2.root->left->right;
-		i = make_interval(15, 23);
+		i = ClosedInterval<int>(15, 23);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 23);
 		REQUIRE(node->color == RBColor::black);
-		REQUIRE(IntTree::is_nil(node->left));
+		REQUIRE(t2.is_nil(node->left));
 
 		node = t2.root->right->left;
-		i = make_interval(19, 20);
+		i = ClosedInterval<int>(19, 20);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 20);
 		REQUIRE(node->color == RBColor::red);
-		REQUIRE(IntTree::is_nil(node->left));
-		REQUIRE(IntTree::is_nil(node->right));
+		REQUIRE(t2.is_nil(node->left));
+		REQUIRE(t2.is_nil(node->right));
 
 		node = t2.root->right->right;
-		i = make_interval(26, 26);
+		i = ClosedInterval<int>(26, 26);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 26);
 		REQUIRE(node->color == RBColor::red);
-		REQUIRE(IntTree::is_nil(node->left));
-		REQUIRE(IntTree::is_nil(node->right));
+		REQUIRE(t2.is_nil(node->left));
+		REQUIRE(t2.is_nil(node->right));
 
 		node = t2.root->left->left->left;
-		i = make_interval(0, 3);
+		i = ClosedInterval<int>(0, 3);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 3);
 		REQUIRE(node->color == RBColor::red);
-		REQUIRE(IntTree::is_nil(node->left));
-		REQUIRE(IntTree::is_nil(node->right));
+		REQUIRE(t2.is_nil(node->left));
+		REQUIRE(t2.is_nil(node->right));
 
 		node = t2.root->left->left->right;
-		i = make_interval(6, 10);
+		i = ClosedInterval<int>(6, 10);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 10);
 		REQUIRE(node->color == RBColor::red);
-		REQUIRE(IntTree::is_nil(node->left));
-		REQUIRE(IntTree::is_nil(node->right));
+		REQUIRE(t2.is_nil(node->left));
+		REQUIRE(t2.is_nil(node->right));
 
 		node = t2.root->left->right->right;
-		i = make_interval(16, 21);
+		i = ClosedInterval<int>(16, 21);
 		REQUIRE_FALSE(node == nullptr);
-		REQUIRE_FALSE(IntTree::is_nil(node));
+		REQUIRE_FALSE(t2.is_nil(node));
 		REQUIRE(node->intvl == i);
 		REQUIRE(node->max == 21);
 		REQUIRE(node->color == RBColor::red);
-		REQUIRE(IntTree::is_nil(node->left));
-		REQUIRE(IntTree::is_nil(node->right));
+		REQUIRE(t2.is_nil(node->left));
+		REQUIRE(t2.is_nil(node->right));
 	}
 
 	SECTION("eq")
 	{
-		IntTree t2(t);
+		IntTree<int, int> t2(t);
 		REQUIRE(t.eq(t2));
 	}
 
 	SECTION("operator==")
 	{
-		IntTree t2(t);
+		IntTree<int, int> t2(t);
 		REQUIRE(t == t2);
 	}
 }

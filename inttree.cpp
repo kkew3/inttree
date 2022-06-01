@@ -7,41 +7,45 @@
 
 #include "inttree.h"
 
-using namespace inttree;
+namespace inttree {
 
-IntTree::~IntTree() {
+template <typename Scalar, typename Payload>
+IntTree<Scalar, Payload>::~IntTree() {
     clear();
     root = nullptr;
     delete NIL;
     NIL = nullptr;
 }
 
-IntTree::IntTree(const IntTree &other) {
+template <typename Scalar, typename Payload>
+IntTree<Scalar, Payload>::IntTree(const IntTree<Scalar, Payload> &other) {
     root = other.clone();
-    if (is_nil(root)) {
+    if (RBNode<Scalar, Payload>::is_nil(root)) {
         NIL = root;
     } else {
         NIL = root->par;
     }
 }
 
-IntTree::IntTree(IntTree &&other) {
-    if (is_nil(other.root)) {
+template <typename Scalar, typename Payload>
+IntTree<Scalar, Payload>::IntTree(IntTree<Scalar, Payload> &&other) {
+    if (RBNode<Scalar, Payload>::is_nil(other.root)) {
         // nothing to move
-        NIL = make_nil();
+        NIL = IntTree<Scalar, Payload>::TreeNode::make_nil();
         root = NIL;
     } else {
         root = other.root;
         NIL = root->par;
-        other.NIL = make_nil();
+        other.NIL = RBNode<Scalar, Payload>::make_nil();
         other.root = other.NIL;
     }
 }
 
-IntTree &IntTree::operator=(const IntTree &other) {
-    RBNode *new_root = other.clone();
-    RBNode *new_nil;
-    if (is_nil(new_root)) {
+template <typename Scalar, typename Payload>
+IntTree<Scalar, Payload> &IntTree<Scalar, Payload>::operator=(const IntTree<Scalar, Payload> &other) {
+    RBNode<Scalar, Payload> *new_root = other.clone();
+    RBNode<Scalar, Payload> *new_nil;
+    if (RBNode<Scalar, Payload>::is_nil(new_root)) {
         new_nil = new_root;
     } else {
         new_nil = new_root->par;
@@ -53,28 +57,29 @@ IntTree &IntTree::operator=(const IntTree &other) {
     return *this;
 }
 
-RBNode *IntTree::clone() const {
-    RBNode *nil_copied = make_nil();
-    if (is_nil(root)) {
+template <typename Scalar, typename Payload>
+RBNode<Scalar, Payload> *IntTree<Scalar, Payload>::clone() const {
+    RBNode<Scalar, Payload> *nil_copied = RBNode<Scalar, Payload>::make_nil();
+    if (RBNode<Scalar, Payload>::is_nil(root)) {
         return nil_copied;
     }
 
-    RBNode *root_copied = new RBNode(root->intvl, root->color);
+    RBNode<Scalar, Payload> *root_copied = new RBNode<Scalar, Payload>(root->intvl, root->color);
     root_copied->max = root->max;
     root_copied->par = nil_copied;
     root_copied->left = nil_copied;
     root_copied->right = nil_copied;
-    std::vector<RBNode *> stack { root };
-    std::vector<RBNode *> stack_copied { root_copied };
+    std::vector<RBNode<Scalar, Payload> *> stack { root };
+    std::vector<RBNode<Scalar, Payload> *> stack_copied { root_copied };
     while (!stack.empty()) {
-        RBNode *curr = stack.back();
-        RBNode *curr_copied = stack_copied.back();
+        RBNode<Scalar, Payload> *curr = stack.back();
+        RBNode<Scalar, Payload> *curr_copied = stack_copied.back();
         stack.pop_back();
         stack_copied.pop_back();
 
-        if (!is_nil(curr->right)) {
+        if (!RBNode<Scalar, Payload>::is_nil(curr->right)) {
             stack.push_back(curr->right);
-            curr_copied->right = new RBNode(curr->right->intvl, curr->right->color);
+            curr_copied->right = new RBNode<Scalar, Payload>(curr->right->intvl, curr->right->color);
             curr_copied->right->max = curr->right->max;
             curr_copied->right->par = curr_copied;
             curr_copied->right->left = nil_copied;
@@ -82,9 +87,9 @@ RBNode *IntTree::clone() const {
             stack_copied.push_back(curr_copied->right);
         }
 
-        if (!is_nil(curr->left)) {
+        if (!RBNode<Scalar, Payload>::is_nil(curr->left)) {
             stack.push_back(curr->left);
-            curr_copied->left = new RBNode(curr->left->intvl, curr->left->color);
+            curr_copied->left = new RBNode<Scalar, Payload>(curr->left->intvl, curr->left->color);
             curr_copied->left->max = curr->left->max;
             curr_copied->left->par = curr_copied;
             curr_copied->left->left = nil_copied;
@@ -95,16 +100,18 @@ RBNode *IntTree::clone() const {
     return root_copied;
 }
 
-void IntTree::clear() {
-    std::vector<RBNode *> stack;
-    RBNode *prev = nullptr;
-    while (!is_nil(root) || !stack.empty()) {
-        if (!is_nil(root)) {
+template <typename Scalar, typename Payload>
+void IntTree<Scalar, Payload>::clear() {
+    std::vector<RBNode<Scalar, Payload> *> stack;
+    RBNode<Scalar, Payload> *prev = nullptr;
+    while (!RBNode<Scalar, Payload>::is_nil(root) || !stack.empty()) {
+        if (!RBNode<Scalar, Payload>::is_nil(root)) {
             stack.push_back(root);
             root = root->left;
         } else {
             root = stack.back();
-            if (is_nil(root->right) || root->right == prev) {
+            if (RBNode<Scalar, Payload>::is_nil(root->right)
+                || root->right == prev) {
                 prev = root;
                 delete root;
                 root = NIL;
@@ -117,19 +124,22 @@ void IntTree::clear() {
     root = NIL;
 }
 
-bool IntTree::eq(const IntTree &other) const {
-    if (is_nil(root) && is_nil(other.root)) {
+template <typename Scalar, typename Payload>
+bool IntTree<Scalar, Payload>::eq(const IntTree<Scalar, Payload> &other) const {
+    if (RBNode<Scalar, Payload>::is_nil(root)
+        && RBNode<Scalar, Payload>::is_nil(other.root)) {
         return true;
     }
-    if (is_nil(root) || is_nil(other.root)) {
+    if (RBNode<Scalar, Payload>::is_nil(root)
+        || RBNode<Scalar, Payload>::is_nil(other.root)) {
         return false;
     }
 
-    std::vector<RBNode *> stack { root };
-    std::vector<RBNode *> stack_other { other.root };
+    std::vector<RBNode<Scalar, Payload> *> stack { root };
+    std::vector<RBNode<Scalar, Payload> *> stack_other { other.root };
     while (!stack.empty()) {
-        RBNode *curr = stack.back();
-        RBNode *curr_other = stack_other.back();
+        RBNode<Scalar, Payload> *curr = stack.back();
+        RBNode<Scalar, Payload> *curr_other = stack_other.back();
         stack.pop_back();
         stack_other.pop_back();
 
@@ -137,31 +147,36 @@ bool IntTree::eq(const IntTree &other) const {
             return false;
         }
 
-        if (!is_nil(curr->right) && !is_nil(curr_other->right)) {
+        if (!RBNode<Scalar, Payload>::is_nil(curr->right)
+            && !RBNode<Scalar, Payload>::is_nil(curr_other->right)) {
             stack.push_back(curr->right);
             stack_other.push_back(curr_other->right);
-        } else if (!is_nil(curr->right) || !is_nil(curr_other->right)) {
+        } else if (!RBNode<Scalar, Payload>::is_nil(curr->right)
+                   || !RBNode<Scalar, Payload>::is_nil(curr_other->right)) {
             return false;
         }
 
-        if (!is_nil(curr->left) && !is_nil(curr_other->left)) {
+        if (!RBNode<Scalar, Payload>::is_nil(curr->left)
+            && !RBNode<Scalar, Payload>::is_nil(curr_other->left)) {
             stack.push_back(curr->left);
             stack_other.push_back(curr_other->left);
-        } else if (!is_nil(curr->left) || !is_nil(curr_other->left)) {
+        } else if (!RBNode<Scalar, Payload>::is_nil(curr->left)
+                   || !RBNode<Scalar, Payload>::is_nil(curr_other->left)) {
             return false;
         }
     }
     return true;
 }
 
-void IntTree::left_rotate(RBNode *x) {
-    RBNode *y = x->right;
+template <typename Scalar, typename Payload>
+void IntTree<Scalar, Payload>::left_rotate(RBNode<Scalar, Payload> *x) {
+    RBNode<Scalar, Payload> *y = x->right;
     x->right = y->left;
-    if (!is_nil(y->left)) {
+    if (!RBNode<Scalar, Payload>::is_nil(y->left)) {
         y->left->par = x;
     }
     y->par = x->par;
-    if (is_nil(x->par)) {
+    if (RBNode<Scalar, Payload>::is_nil(x->par)) {
         root = y;
     } else if (x == x->par->left) {
         x->par->left = y;
@@ -175,14 +190,15 @@ void IntTree::left_rotate(RBNode *x) {
     update_max(x);
 }
 
-void IntTree::right_rotate(RBNode *y) {
-    RBNode *x = y->left;
+template <typename Scalar, typename Payload>
+void IntTree<Scalar, Payload>::right_rotate(RBNode<Scalar, Payload> *y) {
+    RBNode<Scalar, Payload> *x = y->left;
     y->left = x->right;
-    if (!is_nil(x->right)) {
+    if (!RBNode<Scalar, Payload>::is_nil(x->right)) {
         x->right->par = y;
     }
     x->par = y->par;
-    if (is_nil(y->par)) {
+    if (RBNode<Scalar, Payload>::is_nil(y->par)) {
         root = x;
     } else if (y == y->par->left) {
         y->par->left = x;
@@ -196,8 +212,9 @@ void IntTree::right_rotate(RBNode *y) {
     update_max(y);
 }
 
-void IntTree::transplant(RBNode *u, RBNode *v) {
-    if (is_nil(u->par)) {
+template <typename Scalar, typename Payload>
+void IntTree<Scalar, Payload>::transplant(RBNode<Scalar, Payload> *u, RBNode<Scalar, Payload> *v) {
+    if (RBNode<Scalar, Payload>::is_nil(u->par)) {
         root = v;
     } else if (u == u->par->left) {
         u->par->left = v;
@@ -207,29 +224,60 @@ void IntTree::transplant(RBNode *u, RBNode *v) {
     v->par = u->par;
 }
 
-void IntTree::update_max(RBNode *z) {
-    if (is_nil(z->left) && is_nil(z->right)) {
+template <typename Scalar, typename Payload>
+void IntTree<Scalar, Payload>::update_max(RBNode<Scalar, Payload> *z) {
+    if (RBNode<Scalar, Payload>::is_nil(z->left)
+        && RBNode<Scalar, Payload>::is_nil(z->right)) {
         z->max = z->intvl.second;
-    } else if (is_nil(z->left)) {
+    } else if (RBNode<Scalar, Payload>::is_nil(z->left)) {
         z->max = std::max(z->intvl.second, z->right->max);
-    } else if (is_nil(z->right)) {
+    } else if (RBNode<Scalar, Payload>::is_nil(z->right)) {
         z->max = std::max(z->intvl.second, z->left->max);
     } else {
 		z->max = std::max(std::max(z->intvl.second, z->left->max), z->right->max);
     }
 }
 
-RBNode *IntTree::make_node(ClosedInterval i) const {
-    RBNode *z = new RBNode(i, RBColor::red);
+template <typename Scalar, typename Payload>
+RBNode<Scalar, Payload> *IntTree<Scalar, Payload>::make_node(ClosedInterval<Scalar> i) const {
+    RBNode<Scalar, Payload> *z = new RBNode<Scalar, Payload>(i, RBColor::red);
     z->left = NIL;
     z->right = NIL;
     z->par = NIL;
     return z;
 }
 
-RBNode *IntTree::contains(const ClosedInterval &i) const {
-    RBNode *z = root;
-    while (!is_nil(z)) {
+template <typename Scalar, typename Payload>
+RBNode<Scalar, Payload> *IntTree<Scalar, Payload>::make_node(ClosedInterval<Scalar> i, Payload data) const {
+    RBNode<Scalar, Payload> *z = new RBNode<Scalar, Payload>(i, data, RBColor::red);
+    z->left = NIL;
+    z->right = NIL;
+    z->par = NIL;
+    return z;
+}
+
+template <typename Scalar, typename Payload>
+RBNode<Scalar, Payload> *IntTree<Scalar, Payload>::make_node(Scalar first, Scalar second) const {
+    RBNode<Scalar, Payload> *z = new RBNode<Scalar, Payload>(ClosedInterval<Scalar>(first, second), RBColor::red);
+    z->left = NIL;
+    z->right = NIL;
+    z->par = NIL;
+    return z;
+}
+
+template <typename Scalar, typename Payload>
+RBNode<Scalar, Payload> *IntTree<Scalar, Payload>::make_node(Scalar first, Scalar second, Payload data) const {
+    RBNode<Scalar, Payload> *z = new RBNode<Scalar, Payload>(ClosedInterval<Scalar>(first, second), data, RBColor::red);
+    z->left = NIL;
+    z->right = NIL;
+    z->par = NIL;
+    return z;
+}
+
+template <typename Scalar, typename Payload>
+RBNode<Scalar, Payload> *IntTree<Scalar, Payload>::contains(const ClosedInterval<Scalar> &i) const {
+    RBNode<Scalar, Payload> *z = root;
+    while (!RBNode<Scalar, Payload>::is_nil(z)) {
         if (z->intvl == i) {
             return z;
         }
@@ -242,29 +290,42 @@ RBNode *IntTree::contains(const ClosedInterval &i) const {
     return nullptr;
 }
 
-RBNode *IntTree::minimum(RBNode *x) const {
-    while (!is_nil(x->left)) {
+template <typename Scalar, typename Payload>
+RBNode<Scalar, Payload> *IntTree<Scalar, Payload>::minimum(RBNode<Scalar, Payload> *x) const {
+    if (RBNode<Scalar, Payload>::is_nil(x) || !x) {
+        return nullptr;
+    }
+    while (!RBNode<Scalar, Payload>::is_nil(x->left)) {
         x = x->left;
     }
     return x;
 }
 
-RBNode *IntTree::successor(RBNode *x) const {
-    if (!is_nil(x->right)) {
+template <typename Scalar, typename Payload>
+RBNode<Scalar, Payload> *IntTree<Scalar, Payload>::successor(RBNode<Scalar, Payload> *x) const {
+    if (RBNode<Scalar, Payload>::is_nil(x) || !x) {
+        return nullptr;
+    }
+    if (!RBNode<Scalar, Payload>::is_nil(x->right)) {
         return minimum(x->right);
     }
-    RBNode *y = x->par;
-    while (!is_nil(y) && x == y->right) {
+    RBNode<Scalar, Payload> *y = x->par;
+    while (!RBNode<Scalar, Payload>::is_nil(y) && x == y->right) {
         x = y;
         y = y->par;
     }
-    return is_nil(y) ? nullptr : y;
+    return RBNode<Scalar, Payload>::is_nil(y) ? nullptr : y;
 }
 
-void IntTree::insert(RBNode *z) {
-    RBNode *y = NIL;
-    RBNode *x = root;
-    while (!is_nil(x)) {
+template <typename Scalar, typename Payload>
+void IntTree<Scalar, Payload>::insert(RBNode<Scalar, Payload> *z) {
+    if (RBNode<Scalar, Payload>::is_nil(z) || !z) {
+        return;
+    }
+
+    RBNode<Scalar, Payload> *y = NIL;
+    RBNode<Scalar, Payload> *x = root;
+    while (!RBNode<Scalar, Payload>::is_nil(x)) {
         y = x;
         if (z->key() < x->key()) {
             x = x->left;
@@ -273,7 +334,7 @@ void IntTree::insert(RBNode *z) {
         }
     }
     z->par = y;
-    if (is_nil(y)) {
+    if (RBNode<Scalar, Payload>::is_nil(y)) {
         root = z;
     } else if (z->key() < y->key()) {
         y->left = z;
@@ -284,7 +345,7 @@ void IntTree::insert(RBNode *z) {
     z->right = NIL;
     z->color = RBColor::red;
     z->max = z->intvl.second;
-    RBNode *u = z->par;
+    RBNode<Scalar, Payload> *u = z->par;
     while (!is_nil(u)) {
         update_max(u);
         u = u->par;
@@ -329,13 +390,18 @@ void IntTree::insert(RBNode *z) {
     root->color = RBColor::black;
 }
 
-void IntTree::erase(RBNode *z) {
-    RBNode *y = z, *x;
+template <typename Scalar, typename Payload>
+void IntTree<Scalar, Payload>::erase(RBNode<Scalar, Payload> *z) {
+    if (RBNode<Scalar, Payload>::is_nil(z) || !z) {
+        return;
+    }
+
+    RBNode<Scalar, Payload> *y = z, *x;
     RBColor y_orig_color = y->color;
-    if (is_nil(z->left)) {
+    if (RBNode<Scalar, Payload>::is_nil(z->left)) {
         x = z->right;
         transplant(z, z->right);
-    } else if (is_nil(z->right)) {
+    } else if (RBNode<Scalar, Payload>::is_nil(z->right)) {
         x = z->left;
         transplant(z, z->left);
     } else {
@@ -354,8 +420,8 @@ void IntTree::erase(RBNode *z) {
         y->left->par = y;
         y->color = z->color;
     }
-    RBNode *u = x->par;
-    while (!is_nil(u)) {
+    RBNode<Scalar, Payload> *u = x->par;
+    while (!RBNode<Scalar, Payload>::is_nil(u)) {
         update_max(u);
         u = u->par;
     }
@@ -363,7 +429,7 @@ void IntTree::erase(RBNode *z) {
 
     if (y_orig_color == RBColor::black) {
         // fixup
-        RBNode *w;
+        RBNode<Scalar, Payload> *w;
         while (x != root && x->color == RBColor::black) {
             if (x == x->par->left) {
                 w = x->par->right;
@@ -421,40 +487,46 @@ void IntTree::erase(RBNode *z) {
     }
 }
 
-RBNode *IntTree::intsearch(const ClosedInterval &i) const {
-    RBNode *x = root;
-    while (!is_nil(x) && !closed_interval_overlap(x->intvl, i)) {
-        if (!is_nil(x->left) && x->left->max >= i.first) {
+template <typename Scalar, typename Payload>
+RBNode<Scalar, Payload> *IntTree<Scalar, Payload>::intsearch(const ClosedInterval<Scalar> &i) const {
+    RBNode<Scalar, Payload> *x = root;
+    while (!RBNode<Scalar, Payload>::is_nil(x) && !x->intvl.overlap_with(i)) {
+        if (!RBNode<Scalar, Payload>::is_nil(x->left) && x->left->max >= i.first) {
             x = x->left;
         } else {
             x = x->right;
         }
     }
-    return is_nil(x) ? nullptr : x;
+    return RBNode<Scalar, Payload>::is_nil(x) ? nullptr : x;
 }
 
 // Thanks https://github.com/YimingCuiCuiCui/Introduction-to-Algorithms-Solutions/blob/master/C14-Augmenting-Data-Structures/14.3.md#exercises-143-4
-std::vector<RBNode *> IntTree::intsearch_all(const ClosedInterval &i) const {
-    std::vector<RBNode *> result;
-    if (is_nil(root)) {
+template <typename Scalar, typename Payload>
+std::vector<RBNode<Scalar, Payload> *> IntTree<Scalar, Payload>::intsearch_all(const ClosedInterval<Scalar> &i) const {
+    std::vector<RBNode<Scalar, Payload> *> result;
+    if (RBNode<Scalar, Payload>::is_nil(root)) {
         return result;
     }
-    std::vector<RBNode *> stack { root };
+    std::vector<RBNode<Scalar, Payload> *> stack { root };
     while (!stack.empty()) {
-        RBNode *curr = stack.back();
+        RBNode<Scalar, Payload> *curr = stack.back();
         stack.pop_back();
 
-        if (closed_interval_overlap(curr->intvl, i)) {
+        if (curr->intvl.overlap_with(i)) {
             result.push_back(curr);
         }
 
-        if (!is_nil(curr->right) && curr->intvl.first <= i.second
+        if (!RBNode<Scalar, Payload>::is_nil(curr->right)
+            && curr->intvl.first <= i.second
             && curr->right->max >= i.first) {
             stack.push_back(curr->right);
         }
-        if (!is_nil(curr->left) && curr->left->max >= i.first) {
+        if (!RBNode<Scalar, Payload>::is_nil(curr->left)
+            && curr->left->max >= i.first) {
             stack.push_back(curr->left);
         }
     }
     return result;
+}
+
 }

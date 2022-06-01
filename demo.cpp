@@ -9,29 +9,33 @@
 #include <iostream>
 #include <vector>
 
+template class inttree::ClosedInterval<int>;
+template class inttree::RBNode<int, int>;
+template class inttree::IntTree<int, int>;
+
 int main() {
-    inttree::IntTree tree;
-    tree.insert(tree.make_node(inttree::make_interval(17, 19)));
-    tree.insert(tree.make_node(inttree::make_interval(8, 9)));
-    tree.insert(tree.make_node(inttree::make_interval(25, 30)));
+    inttree::IntTree<int, int> tree;
+    tree.insert(tree.make_node(17, 19));
+    tree.insert(tree.make_node(8, 9));
+    tree.insert(tree.make_node(25, 30));
 
     // traverse in in-order and print
     std::cout << "Traverse:\n";
     if (!tree.empty()) {
-        inttree::RBNode *x = tree.minimum();
+        auto *x = tree.minimum();
         do {
             std::cout << "[" << x->intvl.first << ", " << x->intvl.second << "]\n";
         } while ((x = tree.successor(x)));
     }
 
     // find overlapping intervals
-    inttree::ClosedInterval i = inttree::make_interval(18, 26);
+    auto i = inttree::ClosedInterval<int>(18, 26);
     // find any one of the overlapping interval
-    inttree::RBNode *found = tree.intsearch(i);
+    auto *found = tree.intsearch(i);
     std::cout << "found one:\n";
     std::cout << "[" << found->intvl.first << ", " << found->intvl.second << "]\n";
     // find all overlapping interval
-    std::vector<inttree::RBNode *> all_found = tree.intsearch_all(i);
+    auto all_found = tree.intsearch_all(i);
     std::cout << "found all:\n";
     for (auto it = all_found.begin(); it != all_found.end(); ++it) {
         std::cout << "[" << (*it)->intvl.first << ", "
