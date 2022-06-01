@@ -186,7 +186,7 @@ TEST_CASE("IntTree test")
 	SECTION("intsearch(11, 13)")
 	{
 		i = ClosedInterval<int>(11, 13);
-		
+
 		SECTION("intsearch(11, 13) one-by-one")
 		{
 			while ((node = t.intsearch(i))) {
@@ -392,7 +392,7 @@ TEST_CASE("IntTree test")
 		REQUIRE(t2.is_nil(node->left));
 		REQUIRE(t2.is_nil(node->right));
 	}
-	
+
 	SECTION("operator=")
 	{
 		IntTree<int, int> t2 = t;
