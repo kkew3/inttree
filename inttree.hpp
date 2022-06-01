@@ -1,5 +1,5 @@
 //
-//  inttree.h
+//  inttree.hpp
 //  inttree
 //
 //  Created by Kaiwen on 5/29/22.
@@ -19,9 +19,6 @@ struct RBNode;
 /// Scalar must support `<` and `==` operator and be able to be default and copy constructed.
 template <typename Scalar>
 struct ClosedInterval {
-	template <typename _Scalar, typename _Payload>
-	friend class RBNode;
-
 	Scalar first;
 	Scalar second;
 
@@ -39,9 +36,14 @@ struct ClosedInterval {
 	ClosedInterval(const ClosedInterval<Scalar>& other) = default;
 	~ClosedInterval() = default;
 
-	inline bool overlap_with(const ClosedInterval<Scalar>& other)
+	inline bool overlap_with(const ClosedInterval<Scalar>& other) const
 	{
 		return !(second < other.first || other.second < first);
+	}
+
+	inline std::pair<Scalar, Scalar> as_pair() const
+	{
+		return std::make_pair(first, second);
 	}
 };
 
