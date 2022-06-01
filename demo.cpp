@@ -5,7 +5,7 @@
 //  Created by Kaiwen on 5/31/22.
 //
 
-#include "inttree.h"
+#include "inttree.hpp"
 #include <iostream>
 #include <vector>
 

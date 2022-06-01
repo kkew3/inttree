@@ -5,7 +5,7 @@
 //  Created by Kaiwen on 5/30/22.
 //
 
-#include "inttree.h"
+#include "inttree.hpp"
 #include <catch2/catch_test_macros.hpp>
 #include <set>
 #include <vector>
