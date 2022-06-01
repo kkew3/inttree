@@ -6,8 +6,7 @@ This is a simple yet efficient Interval Tree library written in C++ 11.
 The Interval Tree structure is based on Red Black Tree.
 No recursion is used during development.
 The library has been thoroughly unit tested via [Catch2](https://github.com/catchorg/Catch2).
-
-This project is a sub-project of another bigger one, so I'm just tailoring it to my own need -- no data slot in tree, no C++ template, just plain-old int closed intervals -- but more features may be added in the future.
+The library supports generic interval and payload data type.
 
 ## How to build
 
@@ -32,28 +31,30 @@ An example (exerpted from `demo.cpp`):
 
 ```cpp
 // build a tree
-inttree::IntTree tree;
-tree.insert(tree.make_node(inttree::make_interval(17, 19)));
-tree.insert(tree.make_node(inttree::make_interval(8, 9)));
-tree.insert(tree.make_node(inttree::make_interval(25, 30)));
+inttree::IntTree<int, int> tree;
+tree.insert(tree.make_node(17, 19));
+tree.insert(tree.make_node(8, 9));
+tree.insert(tree.make_node(25, 30));
 
 // traverse in in-order and print
 std::cout << "Traverse:\n";
 if (!tree.empty()) {
-    inttree::rbnode *x = tree.minimum();
+    auto* x = tree.minimum();
     do {
-        std::cout << "[" << x->intvl.first << ", " << x->intvl.second << "]\n";
+        std::cout << "[" << x->intvl.first << ", "
+                  << x->intvl.second << "]\n";
     } while ((x = tree.successor(x)));
 }
 
 // find overlapping intervals
-inttree::ClosedInterval i = inttree::make_interval(18, 26);
+auto i = inttree::ClosedInterval<int>(18, 26);
 // find any one of the overlapping interval
-inttree::rbnode *found = tree.intsearch(i);
+auto* found = tree.intsearch(i);
 std::cout << "found one:\n";
-std::cout << "[" << found->intvl.first << ", " << found->intvl.second << "]\n";
+std::cout << "[" << found->intvl.first << ", "
+          << found->intvl.second << "]\n";
 // find all overlapping interval
-std::vector<inttree::rbnode *> all_found = tree.intsearch_all(i);
+auto all_found = tree.intsearch_all(i);
 std::cout << "found all:\n";
 for (auto it = all_found.begin(); it != all_found.end(); ++it) {
     std::cout << "[" << (*it)->intvl.first << ", "
@@ -63,11 +64,16 @@ for (auto it = all_found.begin(); it != all_found.end(); ++it) {
 // erase `found`
 tree.erase(found);
 
-// clear tree
+// clear tree (not necessary most of the time)
 tree.clear();
 ```
 
-See `inttree.h` for detail.
+See `inttree.hpp` for detail.
+
+## Note on header-only setting
+
+See [this answer](https://stackoverflow.com/a/999383/7881370).
+To put it simply, template class must be defined in header file.
 
 ## Similar projects
 
