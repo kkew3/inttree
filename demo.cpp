@@ -11,7 +11,7 @@
 
 int main()
 {
-	inttree::IntTree<int, int> tree;
+	inttree::IntTree<int> tree;
 	tree.insert(tree.make_node(17, 19));
 	tree.insert(tree.make_node(8, 9));
 	tree.insert(tree.make_node(25, 30));

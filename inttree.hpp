@@ -34,6 +34,11 @@ struct ClosedInterval {
 	{
 	}
 	ClosedInterval(const ClosedInterval<Scalar>& other) = default;
+	ClosedInterval(const std::pair<Scalar, Scalar>& other)
+		: first(other.first)
+		, second(other.second)
+	{
+	}
 	~ClosedInterval() = default;
 
 	inline bool overlap_with(const ClosedInterval<Scalar>& other) const
@@ -76,7 +81,7 @@ enum class RBColor { black,
 
 /// Scalar must support `<` operator and be able to be default and copy constructed.
 /// Payload must be able to be default constructed.
-template <typename Scalar, typename Payload>
+template <typename Scalar, typename Payload = bool>
 struct RBNode {
 	ClosedInterval<Scalar> intvl;
 	Scalar max;
@@ -135,7 +140,7 @@ private:
 /// not thread-safe.
 /// Scalar must support `<` operator and be able to be default and copy constructed.
 /// Payload must be able to be default constructed.
-template <typename Scalar, typename Payload>
+template <typename Scalar, typename Payload = bool>
 class IntTree {
 public:
 	using TreeClosedInterval = ClosedInterval<Scalar>;

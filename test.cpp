@@ -32,6 +32,26 @@ TEST_CASE("IntTree trivial insert")
 	REQUIRE(t.root->max == 16);
 }
 
+TEST_CASE("IntTree trivial insert no payload")
+{
+	IntTree<int> t;
+	RBNode<int>* node;
+	ClosedInterval<int> i;
+	REQUIRE(t.is_nil(t.root));
+	REQUIRE(t.root->color == RBColor::black);
+
+	i = ClosedInterval<int>(9, 16);
+	t.insert(t.make_node(i));
+	REQUIRE_FALSE(t.root == nullptr);
+	REQUIRE_FALSE(t.is_nil(t.root));
+	REQUIRE(t.root->intvl == i);
+	REQUIRE(t.is_nil(t.root->left));
+	REQUIRE(t.is_nil(t.root->right));
+	REQUIRE(t.is_nil(t.root->par));
+	REQUIRE(t.root->color == RBColor::black);
+	REQUIRE(t.root->max == 16);
+}
+
 TEST_CASE("IntTree test")
 {
 	std::vector<ClosedInterval<int>> intvls {
